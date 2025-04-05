@@ -22,6 +22,7 @@ import {
   calculateEnergyConsumption,
   getCarbonComparison
 } from '@/lib/carbonCalculator';
+import { addCarbonToday } from './FootprintChart';
 
 const FootprintCounter = () => {
   // State for the carbon counter
@@ -30,8 +31,27 @@ const FootprintCounter = () => {
   const [lastPromptCarbon, setLastPromptCarbon] = useState(0);
   const [promptCount, setPromptCount] = useState(0);
   
-  // Mock function to simulate an AI prompt (in a real extension, this would 
-  // be triggered by detecting an API call to an AI service)
+  // Load saved data on component mount
+  useEffect(() => {
+    const savedTotalCarbon = localStorage.getItem('totalCarbon');
+    const savedPromptCount = localStorage.getItem('promptCount');
+    
+    if (savedTotalCarbon) {
+      setTotalCarbon(parseFloat(savedTotalCarbon));
+    }
+    
+    if (savedPromptCount) {
+      setPromptCount(parseInt(savedPromptCount));
+    }
+  }, []);
+  
+  // Save data when it changes
+  useEffect(() => {
+    localStorage.setItem('totalCarbon', totalCarbon.toString());
+    localStorage.setItem('promptCount', promptCount.toString());
+  }, [totalCarbon, promptCount]);
+  
+  // Mock function to simulate an AI prompt
   const simulateAIPrompt = () => {
     const carbonAmount = calculateCarbonFootprint();
     setLastPromptCarbon(carbonAmount);
@@ -42,6 +62,9 @@ const FootprintCounter = () => {
     
     // Increment prompt counter
     setPromptCount(prev => prev + 1);
+    
+    // Add carbon to today's date for the chart
+    addCarbonToday(carbonAmount);
     
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 500);
