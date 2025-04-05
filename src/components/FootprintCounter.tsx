@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Droplets, Zap, Info } from 'lucide-react';
+import { Droplets, Zap, Info, MessageSquare } from 'lucide-react';
 import { 
   Card, 
   CardContent, 
@@ -28,6 +28,7 @@ const FootprintCounter = () => {
   const [totalCarbon, setTotalCarbon] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [lastPromptCarbon, setLastPromptCarbon] = useState(0);
+  const [promptCount, setPromptCount] = useState(0);
   
   // Mock function to simulate an AI prompt (in a real extension, this would 
   // be triggered by detecting an API call to an AI service)
@@ -38,6 +39,9 @@ const FootprintCounter = () => {
       const newTotal = parseFloat((prev + carbonAmount).toFixed(2));
       return newTotal;
     });
+    
+    // Increment prompt counter
+    setPromptCount(prev => prev + 1);
     
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 500);
@@ -68,7 +72,7 @@ const FootprintCounter = () => {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-muted p-4 rounded-lg">
               <div className="flex flex-col items-center">
                 <div className="text-eco-leaf text-3xl font-bold mb-1">
@@ -102,6 +106,18 @@ const FootprintCounter = () => {
                 </div>
                 <div className="text-xs text-muted-foreground text-center">
                   Energy Consumption
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-muted p-4 rounded-lg">
+              <div className="flex flex-col items-center">
+                <div className="flex items-center text-indigo-500 text-xl font-bold mb-1">
+                  <MessageSquare className="mr-1 h-4 w-4" />
+                  <span>{promptCount}</span>
+                </div>
+                <div className="text-xs text-muted-foreground text-center">
+                  Total Prompts
                 </div>
               </div>
             </div>
