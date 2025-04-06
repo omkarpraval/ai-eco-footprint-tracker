@@ -20,6 +20,12 @@ import {
 } from 'lucide-react';
 import { AI_TOOLS, connectAITool, disconnectAITool, simulateExternalAIPrompt } from '@/lib/aiToolsIntegration';
 import { useToast } from "@/hooks/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const AIToolsConnector = () => {
   const [tools, setTools] = useState([...AI_TOOLS]);
@@ -108,21 +114,30 @@ const AIToolsConnector = () => {
                   </Label>
                 </div>
                 {tool.isConnected ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedTool(tool.id);
-                      toast({
-                        title: "Tool Selected",
-                        description: `You can now simulate prompts from ${tool.name}`,
-                      });
-                    }}
-                    className={selectedTool === tool.id ? "bg-muted" : ""}
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    {selectedTool === tool.id ? "Selected" : "Select"}
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedTool(tool.id);
+                            toast({
+                              title: "Tool Selected",
+                              description: `You can now simulate prompts from ${tool.name}`,
+                            });
+                          }}
+                          className={selectedTool === tool.id ? "bg-muted" : ""}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          {selectedTool === tool.id ? "Selected" : "Select"}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Select this tool to simulate prompts</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 ) : (
                   <div className="text-xs text-muted-foreground">Not connected</div>
                 )}
