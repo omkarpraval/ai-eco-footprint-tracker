@@ -3,10 +3,10 @@
  * Constants for carbon emissions calculations
  * These are simplified estimates and can be adjusted based on more accurate data
  */
-const CARBON_PER_TOKEN = 0.0002; // grams of CO2 per token
+const CARBON_PER_TOKEN = 0.002; // increased from 0.0002 to be more visible
 const TOKENS_PER_PROMPT = 30; // average tokens per prompt
-const WATER_PER_TOKEN = 0.1; // mL of water per token
-const ENERGY_PER_TOKEN = 0.0003; // kWh per token
+const WATER_PER_TOKEN = 0.5; // increased from 0.1 to be more visible
+const ENERGY_PER_TOKEN = 0.0005; // increased from 0.0003 to be more visible
 
 /**
  * Calculate the carbon footprint of an AI prompt

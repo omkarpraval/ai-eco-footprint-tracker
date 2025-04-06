@@ -41,11 +41,13 @@ const FootprintCounter = () => {
   const [promptCount, setPromptCount] = useState(0);
   const [selectedTool, setSelectedTool] = useState(AI_TOOLS[0].id);
   const [promptText, setPromptText] = useState('');
+  const [totalTokens, setTotalTokens] = useState(0); // Added to track total tokens
   
   // Load saved data on component mount
   useEffect(() => {
     const savedTotalCarbon = localStorage.getItem('totalCarbon');
     const savedPromptCount = localStorage.getItem('promptCount');
+    const savedTotalTokens = localStorage.getItem('totalTokens');
     
     if (savedTotalCarbon) {
       setTotalCarbon(parseFloat(savedTotalCarbon));
@@ -53,6 +55,10 @@ const FootprintCounter = () => {
     
     if (savedPromptCount) {
       setPromptCount(parseInt(savedPromptCount));
+    }
+    
+    if (savedTotalTokens) {
+      setTotalTokens(parseInt(savedTotalTokens));
     }
     
     // Initialize AI tools tracking
@@ -63,7 +69,8 @@ const FootprintCounter = () => {
   useEffect(() => {
     localStorage.setItem('totalCarbon', totalCarbon.toString());
     localStorage.setItem('promptCount', promptCount.toString());
-  }, [totalCarbon, promptCount]);
+    localStorage.setItem('totalTokens', totalTokens.toString());
+  }, [totalCarbon, promptCount, totalTokens]);
   
   // Track a prompt with the selected AI tool
   const trackPrompt = () => {
@@ -73,6 +80,20 @@ const FootprintCounter = () => {
       const newTotal = parseFloat((prev + carbonAmount).toFixed(2));
       return newTotal;
     });
+    
+    // Calculate tokens based on the tool used or prompt text
+    const tool = AI_TOOLS.find(t => t.id === selectedTool);
+    let tokenCount = 0;
+    
+    if (promptText) {
+      // Rough estimation: ~4 chars per token
+      tokenCount = Math.ceil(promptText.length / 4);
+    } else if (tool) {
+      tokenCount = tool.avgTokensPerPrompt;
+    }
+    
+    // Update total tokens
+    setTotalTokens(prev => prev + tokenCount);
     
     // Increment prompt counter
     setPromptCount(prev => prev + 1);
@@ -124,7 +145,7 @@ const FootprintCounter = () => {
               <div className="flex flex-col items-center">
                 <div className="flex items-center text-eco-water text-xl font-bold mb-1">
                   <Droplets className="mr-1 h-4 w-4" />
-                  <span>{calculateWaterUsage(totalCarbon * 5).toFixed(1)} mL</span>
+                  <span>{calculateWaterUsage(totalTokens).toFixed(1)} mL</span>
                 </div>
                 <div className="text-xs text-muted-foreground text-center">
                   Estimated Water Usage
@@ -136,7 +157,7 @@ const FootprintCounter = () => {
               <div className="flex flex-col items-center">
                 <div className="flex items-center text-amber-500 text-xl font-bold mb-1">
                   <Zap className="mr-1 h-4 w-4" />
-                  <span>{calculateEnergyConsumption(totalCarbon * 5).toFixed(4)} kWh</span>
+                  <span>{calculateEnergyConsumption(totalTokens).toFixed(4)} kWh</span>
                 </div>
                 <div className="text-xs text-muted-foreground text-center">
                   Energy Consumption

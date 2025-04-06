@@ -1,4 +1,3 @@
-
 import { addCarbonToday } from '@/components/FootprintChart';
 import { calculateCarbonFootprint } from './carbonCalculator';
 
@@ -11,6 +10,9 @@ export const AI_TOOLS = [
   { id: 'dall-e', name: 'DALL-E', avgTokensPerPrompt: 150 },
   { id: 'copilot', name: 'GitHub Copilot', avgTokensPerPrompt: 60 },
 ];
+
+// Keep track of total tokens used in this session
+let sessionTotalTokens = 0;
 
 // Mock function to simulate tracking a prompt from a specific AI tool
 export const trackAIPrompt = (
@@ -39,6 +41,9 @@ export const trackAIPrompt = (
     }
   }
   
+  // Track session tokens
+  sessionTotalTokens += tokenCount;
+  
   // Calculate carbon footprint
   const carbonAmount = calculateCarbonFootprint(tokenCount);
   
@@ -49,6 +54,11 @@ export const trackAIPrompt = (
   addCarbonToday(carbonAmount);
   
   return carbonAmount;
+};
+
+// Function to get the total tokens used in this session
+export const getSessionTotalTokens = (): number => {
+  return sessionTotalTokens;
 };
 
 // Function to set up listeners for common AI tools (in production, this would integrate with browser extensions)

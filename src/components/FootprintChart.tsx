@@ -189,7 +189,7 @@ const FootprintChart = () => {
               <PaginationNext 
                 onClick={goToNextWeek} 
                 className={!canGoForward() ? "opacity-50 cursor-not-allowed" : ""}
-                disabled={!canGoForward()}
+                aria-disabled={!canGoForward()}
               />
             </PaginationItem>
           </PaginationContent>
