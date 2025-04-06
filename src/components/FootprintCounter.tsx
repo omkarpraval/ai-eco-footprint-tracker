@@ -23,6 +23,15 @@ import {
   getCarbonComparison
 } from '@/lib/carbonCalculator';
 import { addCarbonToday } from './FootprintChart';
+import { AI_TOOLS, trackAIPrompt, setupAIToolsTracking } from '@/lib/aiToolsIntegration';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 const FootprintCounter = () => {
   // State for the carbon counter
@@ -30,6 +39,8 @@ const FootprintCounter = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [lastPromptCarbon, setLastPromptCarbon] = useState(0);
   const [promptCount, setPromptCount] = useState(0);
+  const [selectedTool, setSelectedTool] = useState(AI_TOOLS[0].id);
+  const [promptText, setPromptText] = useState('');
   
   // Load saved data on component mount
   useEffect(() => {
@@ -43,6 +54,9 @@ const FootprintCounter = () => {
     if (savedPromptCount) {
       setPromptCount(parseInt(savedPromptCount));
     }
+    
+    // Initialize AI tools tracking
+    setupAIToolsTracking();
   }, []);
   
   // Save data when it changes
@@ -51,9 +65,9 @@ const FootprintCounter = () => {
     localStorage.setItem('promptCount', promptCount.toString());
   }, [totalCarbon, promptCount]);
   
-  // Mock function to simulate an AI prompt
-  const simulateAIPrompt = () => {
-    const carbonAmount = calculateCarbonFootprint();
+  // Track a prompt with the selected AI tool
+  const trackPrompt = () => {
+    const carbonAmount = trackAIPrompt(selectedTool, promptText);
     setLastPromptCarbon(carbonAmount);
     setTotalCarbon(prev => {
       const newTotal = parseFloat((prev + carbonAmount).toFixed(2));
@@ -62,9 +76,6 @@ const FootprintCounter = () => {
     
     // Increment prompt counter
     setPromptCount(prev => prev + 1);
-    
-    // Add carbon to today's date for the chart
-    addCarbonToday(carbonAmount);
     
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 500);
@@ -146,6 +157,36 @@ const FootprintCounter = () => {
             </div>
           </div>
           
+          <div className="space-y-3 mt-2">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="md:col-span-3">
+                <Textarea
+                  placeholder="Enter your AI prompt here"
+                  className="min-h-[80px]"
+                  value={promptText}
+                  onChange={(e) => setPromptText(e.target.value)}
+                />
+              </div>
+              <div>
+                <Select
+                  value={selectedTool}
+                  onValueChange={setSelectedTool}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select AI Tool" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {AI_TOOLS.map(tool => (
+                      <SelectItem key={tool.id} value={tool.id}>
+                        {tool.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          
           {lastPromptCarbon > 0 && (
             <div className="text-sm text-muted-foreground">
               Last AI interaction: <span className="font-medium text-foreground">{lastPromptCarbon}g CO₂</span>
@@ -161,10 +202,10 @@ const FootprintCounter = () => {
       </CardContent>
       <CardFooter>
         <Button 
-          onClick={simulateAIPrompt} 
+          onClick={trackPrompt} 
           className="w-full bg-eco-leaf hover:bg-eco-leafLight"
         >
-          Simulate AI Prompt
+          Track AI Prompt
         </Button>
       </CardFooter>
     </Card>

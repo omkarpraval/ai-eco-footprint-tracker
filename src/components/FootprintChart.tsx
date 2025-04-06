@@ -1,14 +1,24 @@
 
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { format, subDays } from 'date-fns';
+import { format, subDays, addDays, isAfter, isBefore, startOfToday } from 'date-fns';
 import { 
   Card, 
   CardContent, 
   CardDescription, 
   CardHeader, 
-  CardTitle 
+  CardTitle, 
+  CardFooter
 } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 // Add this interface for our chart data
 interface DailyFootprint {
@@ -54,16 +64,17 @@ export const addCarbonToday = (carbonAmount: number): void => {
 const FootprintChart = () => {
   // State to store our chart data
   const [chartData, setChartData] = useState<DailyFootprint[]>([]);
+  // Track the current date range we're viewing
+  const [currentStartDate, setCurrentStartDate] = useState(subDays(new Date(), 6));
   
-  // Update chart data on component mount and when carbon is updated
+  // Update chart data when date range changes or when carbon is updated
   useEffect(() => {
     const updateChartData = () => {
-      const today = new Date();
       const data: DailyFootprint[] = [];
       
-      // Generate empty data for the last 7 days
-      for (let i = 6; i >= 0; i--) {
-        const date = subDays(today, i);
+      // Generate data for the current 7-day window
+      for (let i = 0; i < 7; i++) {
+        const date = addDays(currentStartDate, i);
         const dateKey = format(date, 'yyyy-MM-dd');
         const formattedDate = format(date, 'MMM dd');
         
@@ -83,7 +94,7 @@ const FootprintChart = () => {
       setChartData(data);
     };
     
-    // Update on mount
+    // Update when dates change
     updateChartData();
     
     // Listen for carbon updates
@@ -93,7 +104,33 @@ const FootprintChart = () => {
     return () => {
       window.removeEventListener('carbon-updated', updateChartData);
     };
-  }, []);
+  }, [currentStartDate]);
+
+  // Navigate to previous week
+  const goToPreviousWeek = () => {
+    setCurrentStartDate(prevDate => subDays(prevDate, 7));
+  };
+
+  // Navigate to next week, but not beyond today
+  const goToNextWeek = () => {
+    const potentialNextDate = addDays(currentStartDate, 7);
+    const today = startOfToday();
+    
+    // Only allow navigation up to current week
+    if (!isAfter(potentialNextDate, today)) {
+      setCurrentStartDate(potentialNextDate);
+    }
+  };
+
+  // Check if we can go forward (not beyond current week)
+  const canGoForward = () => {
+    const nextWeekStart = addDays(currentStartDate, 7);
+    const today = startOfToday();
+    return isBefore(nextWeekStart, today);
+  };
+
+  // Format date range for display
+  const dateRangeText = `${format(currentStartDate, 'MMM dd')} - ${format(addDays(currentStartDate, 6), 'MMM dd, yyyy')}`;
 
   return (
     <Card className="w-full">
@@ -134,12 +171,30 @@ const FootprintChart = () => {
             </BarChart>
           </ResponsiveContainer>
         </div>
+        
         {chartData.reduce((total, day) => total + day.promptCount, 0) === 0 && (
           <div className="text-center mt-4 text-muted-foreground">
             Use the "Simulate AI Prompt" button to start tracking your carbon footprint
           </div>
         )}
       </CardContent>
+      <CardFooter className="flex flex-col space-y-2">
+        <div className="text-sm text-center font-medium">{dateRangeText}</div>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious onClick={goToPreviousWeek} />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext 
+                onClick={goToNextWeek} 
+                className={!canGoForward() ? "opacity-50 cursor-not-allowed" : ""}
+                disabled={!canGoForward()}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </CardFooter>
     </Card>
   );
 };
