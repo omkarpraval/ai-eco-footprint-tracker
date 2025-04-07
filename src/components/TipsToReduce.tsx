@@ -25,22 +25,22 @@ const TipsToReduce: React.FC<TipsToReduceProps> = ({ promptText, isLowImpact }) 
   // Tips for reducing environmental impact
   const tips = [
     {
-      icon: <MessageSquare className="h-4 w-4 text-blue-500 inline-block mr-1" />,
+      icon: <MessageSquare className="h-4 w-4 text-blue-500" />,
       title: "Use Concise Prompts",
       description: "Keep your prompts short and specific. Every token has an environmental cost."
     },
     {
-      icon: <CheckCircle className="h-4 w-4 text-green-500 inline-block mr-1" />,
+      icon: <CheckCircle className="h-4 w-4 text-green-500" />,
       title: "Reuse Prompts",
       description: "Instead of typing similar prompts multiple times, modify and reuse previous ones."
     },
     {
-      icon: <Lightbulb className="h-4 w-4 text-amber-500 inline-block mr-1" />,
+      icon: <Lightbulb className="h-4 w-4 text-amber-500" />,
       title: "Batch Your Requests",
       description: "Instead of many small queries, combine them into one comprehensive prompt."
     },
     {
-      icon: <Info className="h-4 w-4 text-purple-500 inline-block mr-1" />,
+      icon: <Info className="h-4 w-4 text-purple-500" />,
       title: "Use More Efficient Models",
       description: "Choose smaller, more efficient AI models when your task doesn't require the largest ones."
     }
@@ -70,11 +70,13 @@ const TipsToReduce: React.FC<TipsToReduceProps> = ({ promptText, isLowImpact }) 
         <ul className="space-y-3">
           {tips.map((tip, index) => (
             <li key={index} className="flex">
-              <div className="flex items-center">
+              <div className="mt-0.5 mr-2">
                 {tip.icon}
-                <h4 className="text-sm font-medium">{tip.title}</h4>
               </div>
-              <p className="text-xs text-muted-foreground ml-5">{tip.description}</p>
+              <div>
+                <h4 className="text-sm font-medium">{tip.title}</h4>
+                <p className="text-xs text-muted-foreground">{tip.description}</p>
+              </div>
             </li>
           ))}
         </ul>
