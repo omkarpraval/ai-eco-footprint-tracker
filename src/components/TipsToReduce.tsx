@@ -4,7 +4,8 @@ import {
   MessageSquare, 
   CheckCircle, 
   Lightbulb, 
-  Info 
+  Info,
+  Leaf
 } from 'lucide-react';
 import { 
   Card, 
