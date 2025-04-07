@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { 
   Car, 
   Droplets, 
   Lightbulb, 
   Info,
-  Tree,
+  Trees,
   Sandwich
 } from 'lucide-react';
 import { 
@@ -29,7 +28,6 @@ const ImpactEquivalents: React.FC<ImpactEquivalentsProps> = ({
   energyConsumption,
   isHighImpact
 }) => {
-  // Calculate real-world equivalents
   const carKilometers = (totalCarbon / 120).toFixed(2); // ~120g CO2 per km in average car
   const waterBottles = (waterUsage / 500).toFixed(2); // 500mL standard water bottle
   const ledHours = (energyConsumption / 0.01).toFixed(1); // 10W LED = 0.01 kWh per hour
@@ -115,7 +113,7 @@ const ImpactEquivalents: React.FC<ImpactEquivalentsProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="bg-teal-50 p-3 rounded-lg flex items-center">
           <div className="mr-3 bg-teal-100 p-2 rounded-full">
-            <Tree className="h-4 w-4 text-teal-600" />
+            <Trees className="h-4 w-4 text-teal-600" />
           </div>
           <div className="text-xs">
             <p className="font-medium text-teal-800">Tree Absorption</p>
