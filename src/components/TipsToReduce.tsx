@@ -1,12 +1,10 @@
 
 import React from 'react';
 import { 
-  Info, 
-  Lightbulb, 
-  Leaf, 
-  ThumbsUp, 
+  MessageSquare, 
   CheckCircle, 
-  MessageSquare 
+  Lightbulb, 
+  Info 
 } from 'lucide-react';
 import { 
   Card, 
